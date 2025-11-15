@@ -1,15 +1,13 @@
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import jwt
-from passlib.context import CryptContext
+import bcrypt
 from sqlalchemy.orm import Session
 from app.config import settings
 from app.repositories.user_repository import UserRepository
 from app.schemas.user import UserCreate
 from app.schemas.auth import Token
 from app.exceptions import UnauthorizedError, ValidationError
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class AuthService:
@@ -20,12 +18,37 @@ class AuthService:
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
         """Verify a password against its hash."""
-        return pwd_context.verify(plain_password, hashed_password)
+        # Bcrypt has a 72-byte limit, so truncate if necessary
+        password_bytes = plain_password.encode('utf-8')
+        if len(password_bytes) > 72:
+            password_bytes = password_bytes[:72]
+        
+        # Use bcrypt directly to verify (both must be bytes)
+        try:
+            return bcrypt.checkpw(password_bytes, hashed_password.encode('utf-8'))
+        except Exception:
+            return False
 
     @staticmethod
     def get_password_hash(password: str) -> str:
         """Hash a password."""
-        return pwd_context.hash(password)
+        # Bcrypt has a 72-byte limit
+        # Convert to bytes and truncate if necessary before hashing
+        password_bytes = password.encode('utf-8')
+        if len(password_bytes) > 72:
+            # Truncate to 72 bytes
+            password_bytes = password_bytes[:72]
+            # Decode back to string, handling potential incomplete UTF-8 sequences
+            try:
+                password = password_bytes.decode('utf-8')
+            except UnicodeDecodeError:
+                # If truncation broke a UTF-8 sequence, decode with error handling
+                password = password_bytes.decode('utf-8', errors='ignore')
+        
+        # Generate salt and hash using bcrypt directly
+        salt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(password_bytes, salt)
+        return hashed.decode('utf-8')
 
     @staticmethod
     def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
