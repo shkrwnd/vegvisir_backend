@@ -20,6 +20,10 @@ class UserRepository:
         """Get user by student ID."""
         return self.db.query(User).filter(User.student_id == student_id).first()
 
+    def get_by_reset_token(self, reset_token: str) -> Optional[User]:
+        """Get user by reset token."""
+        return self.db.query(User).filter(User.reset_token == reset_token).first()
+
     def create(self, user_data: UserCreate, hashed_password: str) -> User:
         """Create a new user."""
         db_user = User(

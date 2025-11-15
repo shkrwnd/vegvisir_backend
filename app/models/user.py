@@ -22,6 +22,8 @@ class User(Base):
     major = Column(String, nullable=True)
     class_year = Column(String, nullable=True)
     role = Column(Enum(UserRole), default=UserRole.STUDENT, nullable=False)
+    reset_token = Column(String, nullable=True, index=True)
+    reset_token_expires = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 

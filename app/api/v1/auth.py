@@ -5,7 +5,7 @@ from app.database import get_db
 from app.dependencies import get_current_active_user
 from app.models.user import User
 from app.schemas.user import UserCreate, UserResponse
-from app.schemas.auth import Token
+from app.schemas.auth import Token, ForgotPasswordRequest, ResetPasswordRequest
 from app.services.auth_service import AuthService
 from app.exceptions import ValidationError, UnauthorizedError
 
@@ -84,4 +84,53 @@ def get_current_user_info(
     Requires authentication via JWT token.
     """
     return UserResponse.model_validate(current_user)
+
+
+@router.post("/forgot-password", response_model=dict)
+def forgot_password(
+    request: ForgotPasswordRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Request a password reset.
+    
+    - **email**: User's email address
+    
+    Generates a password reset token. In production, this would be sent via email.
+    For development, the token is returned in the response.
+    """
+    try:
+        auth_service = AuthService(db)
+        return auth_service.forgot_password(request.email)
+    except Exception as e:
+        # Always return success message for security (don't reveal if email exists)
+        return {"message": "If the email exists, a password reset link has been sent."}
+
+
+@router.post("/reset-password", response_model=dict)
+def reset_password(
+    request: ResetPasswordRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Reset password using a reset token.
+    
+    - **token**: Password reset token received from forgot-password endpoint
+    - **new_password**: New password (8-72 characters)
+    
+    The reset token expires after 1 hour.
+    """
+    try:
+        auth_service = AuthService(db)
+        return auth_service.reset_password(request.token, request.new_password)
+    except ValidationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=e.message
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Password reset failed: {str(e)}"
+        )
 

@@ -39,19 +39,42 @@ curl -X GET "http://localhost:8000/api/v1/auth/me" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
+### 4. Forgot Password
+```bash
+curl -X POST "http://localhost:8000/api/v1/auth/forgot-password" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "student@example.com"
+  }'
+```
+
+**Response:** Returns a password reset token (in development). In production, this would be sent via email.
+
+### 5. Reset Password
+```bash
+curl -X POST "http://localhost:8000/api/v1/auth/reset-password" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "RESET_TOKEN_FROM_FORGOT_PASSWORD",
+    "new_password": "newpassword123"
+  }'
+```
+
+**Note:** The reset token expires after 1 hour. After resetting, the token is invalidated.
+
 ---
 
 ## Transaction Endpoints
 
 **Note:** Transactions are automatically created when payments are completed. They are read-only records and cannot be manually created, updated, or deleted.
 
-### 4. Get All Transactions
+### 6. Get All Transactions
 ```bash
 curl -X GET "http://localhost:8000/api/v1/transactions/?skip=0&limit=10" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-### 5. Get Transactions with Filters
+### 7. Get Transactions with Filters
 ```bash
 # Filter by category
 curl -X GET "http://localhost:8000/api/v1/transactions/?category=dining" \
@@ -68,13 +91,13 @@ curl -X GET "http://localhost:8000/api/v1/transactions/?category=dining&skip=0&l
 
 **Available categories:** `dining`, `books`, `transportation`, `entertainment`, `services`, `other`
 
-### 6. Get Transaction by ID
+### 8. Get Transaction by ID
 ```bash
 curl -X GET "http://localhost:8000/api/v1/transactions/1" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-### 7. Get Spending Analytics
+### 9. Get Spending Analytics
 ```bash
 # Get analytics for last 30 days (default)
 curl -X GET "http://localhost:8000/api/v1/transactions/analytics" \
@@ -89,13 +112,13 @@ curl -X GET "http://localhost:8000/api/v1/transactions/analytics?start_date=2025
 
 ## Budget Endpoints
 
-### 11. Get All Budgets
+### 10. Get All Budgets
 ```bash
 curl -X GET "http://localhost:8000/api/v1/budgets/?skip=0&limit=10" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-### 12. Create Budget
+### 11. Create Budget
 ```bash
 curl -X POST "http://localhost:8000/api/v1/budgets/" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
@@ -111,25 +134,25 @@ curl -X POST "http://localhost:8000/api/v1/budgets/" \
 
 **Available periods:** `weekly`, `monthly`
 
-### 13. Get Budget by ID
+### 12. Get Budget by ID
 ```bash
 curl -X GET "http://localhost:8000/api/v1/budgets/1" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-### 14. Get Budget Tracking
+### 13. Get Budget Tracking
 ```bash
 curl -X GET "http://localhost:8000/api/v1/budgets/1/tracking" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-### 15. Get All Budgets with Tracking
+### 14. Get All Budgets with Tracking
 ```bash
 curl -X GET "http://localhost:8000/api/v1/budgets/tracking" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-### 16. Update Budget
+### 15. Update Budget
 ```bash
 curl -X PUT "http://localhost:8000/api/v1/budgets/1" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
@@ -139,7 +162,7 @@ curl -X PUT "http://localhost:8000/api/v1/budgets/1" \
   }'
 ```
 
-### 17. Delete Budget
+### 16. Delete Budget
 ```bash
 curl -X DELETE "http://localhost:8000/api/v1/budgets/1" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
@@ -149,13 +172,13 @@ curl -X DELETE "http://localhost:8000/api/v1/budgets/1" \
 
 ## Payment Endpoints
 
-### 18. Get All Payments
+### 17. Get All Payments
 ```bash
 curl -X GET "http://localhost:8000/api/v1/payments/?skip=0&limit=10" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-### 19. Get Payments with Filters
+### 18. Get Payments with Filters
 ```bash
 # Filter by status
 curl -X GET "http://localhost:8000/api/v1/payments/?status=pending" \
@@ -173,7 +196,7 @@ curl -X GET "http://localhost:8000/api/v1/payments/?status=completed&payment_typ
 **Available statuses:** `pending`, `completed`, `failed`, `cancelled`
 **Available payment types:** `event`, `club`, `dining`, `printing`, `service`, `other`
 
-### 20. Create Payment
+### 19. Create Payment
 ```bash
 curl -X POST "http://localhost:8000/api/v1/payments/" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
@@ -185,13 +208,13 @@ curl -X POST "http://localhost:8000/api/v1/payments/" \
   }'
 ```
 
-### 21. Get Payment by ID
+### 20. Get Payment by ID
 ```bash
 curl -X GET "http://localhost:8000/api/v1/payments/1" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-### 22. Complete Payment
+### 21. Complete Payment
 ```bash
 curl -X POST "http://localhost:8000/api/v1/payments/1/complete" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
@@ -205,7 +228,7 @@ curl -X POST "http://localhost:8000/api/v1/payments/1/complete" \
 
 ## Health Check
 
-### 25. Health Check
+### 22. Health Check
 ```bash
 curl -X GET "http://localhost:8000/health"
 ```

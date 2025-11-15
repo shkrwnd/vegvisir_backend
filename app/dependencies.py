@@ -27,10 +27,20 @@ def get_current_user(
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
-        user_id: int = payload.get("sub")
-        if user_id is None:
+        user_id_str = payload.get("sub")
+        if user_id_str is None:
             raise credentials_exception
-    except JWTError:
+        
+        # Convert user_id from string to integer (JWT sub claim is a string)
+        try:
+            user_id = int(user_id_str)
+        except (ValueError, TypeError):
+            raise credentials_exception
+    except JWTError as e:
+        # JWT decoding failed (invalid token, expired, wrong secret, etc.)
+        raise credentials_exception
+    except (ValueError, TypeError) as e:
+        # Invalid user_id format
         raise credentials_exception
     
     user_repo = UserRepository(db)
