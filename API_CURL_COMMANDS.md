@@ -657,9 +657,60 @@ curl -X DELETE "http://localhost:8000/api/v1/cards/1" \
 
 ---
 
+## Wallet Endpoints
+
+### 27. Get Wallet Balance (Flex Dollars)
+```bash
+curl -X GET "http://localhost:8000/api/v1/wallet" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "user_id": 1,
+  "balance": 150.75,
+  "created_at": "2025-11-15T19:59:20.630645Z",
+  "updated_at": "2025-11-15T20:15:30.123456Z"
+}
+```
+
+**Note:** If a wallet doesn't exist for the user, it will be automatically created with a balance of 0.0.
+
+### 28. Load Money into Wallet
+```bash
+curl -X POST "http://localhost:8000/api/v1/wallet/load" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 50.00,
+    "card_id": 1
+  }'
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "user_id": 1,
+  "balance": 200.75,
+  "created_at": "2025-11-15T19:59:20.630645Z",
+  "updated_at": "2025-11-15T20:20:45.789012Z"
+}
+```
+
+**Note:** 
+- `amount` must be greater than 0 and cannot exceed $10,000 per transaction
+- `card_id` must be a valid card that belongs to the authenticated user
+- The wallet balance will be updated atomically
+- If the wallet doesn't exist, it will be created automatically
+
+---
+
 ## Health Check
 
-### 27. Health Check
+### 29. Health Check
 ```bash
 curl -X GET "http://localhost:8000/health"
 ```
@@ -739,4 +790,5 @@ curl -X GET "http://localhost:8000/api/v1/transactions/analytics" \
 - **Payments are immutable**: Once created, payments cannot be updated or deleted. Only the status can be changed by completing the payment.
 - **Payment Flow**: Create a payment → Complete the payment → Transaction is automatically created
 - **Cards**: Users can manage multiple debit/credit cards. Only one card can be set as default at a time. Card number is stored as last 4 digits only for security.
+- **Wallet (Flex Dollars)**: Each student has a wallet with Flex Dollars balance. Money can be loaded from saved debit/credit cards. Wallets are created lazily (when first accessed or when money is first loaded). Balance updates are atomic operations.
 

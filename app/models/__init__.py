@@ -3,6 +3,7 @@ from app.models.transaction import Transaction
 from app.models.budget import Budget
 from app.models.payment import Payment
 from app.models.card import Card
+from app.models.wallet import Wallet
 
-__all__ = ["User", "Transaction", "Budget", "Payment", "Card"]
+__all__ = ["User", "Transaction", "Budget", "Payment", "Card", "Wallet"]
 
