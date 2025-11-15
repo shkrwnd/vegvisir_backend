@@ -32,4 +32,5 @@ class User(Base):
     budgets = relationship("Budget", back_populates="user", cascade="all, delete-orphan")
     payments = relationship("Payment", back_populates="user", cascade="all, delete-orphan")
     cards = relationship("Card", back_populates="user", cascade="all, delete-orphan")
+    wallet = relationship("Wallet", back_populates="user", uselist=False, cascade="all, delete-orphan")
 
