@@ -18,6 +18,25 @@ curl -X POST "http://localhost:8000/api/v1/auth/register" \
   }'
 ```
 
+**Response:**
+```json
+{
+  "user": {
+    "id": 1,
+    "email": "student@example.com",
+    "full_name": "John Doe",
+    "student_id": "STU12345",
+    "major": "Computer Science",
+    "class_year": "2025",
+    "role": "student",
+    "created_at": "2025-11-15T14:14:34.235054Z",
+    "updated_at": "2025-11-15T14:14:34.235054Z"
+  },
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer"
+}
+```
+
 ### 2. Login
 ```bash
 curl -X POST "http://localhost:8000/api/v1/auth/login" \
@@ -39,6 +58,21 @@ curl -X GET "http://localhost:8000/api/v1/auth/me" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
+**Response:**
+```json
+{
+  "id": 1,
+  "email": "student@example.com",
+  "full_name": "John Doe",
+  "student_id": "STU12345",
+  "major": "Computer Science",
+  "class_year": "2025",
+  "role": "student",
+  "created_at": "2025-11-15T14:14:34.235054Z",
+  "updated_at": "2025-11-15T14:27:59.053040Z"
+}
+```
+
 ### 4. Forgot Password
 ```bash
 curl -X POST "http://localhost:8000/api/v1/auth/forgot-password" \
@@ -48,7 +82,15 @@ curl -X POST "http://localhost:8000/api/v1/auth/forgot-password" \
   }'
 ```
 
-**Response:** Returns a password reset token (in development). In production, this would be sent via email.
+**Response:**
+```json
+{
+  "message": "If the email exists, a password reset link has been sent.",
+  "reset_token": "abc123xyz789..." 
+}
+```
+
+**Note:** In production, the reset token would be sent via email. In development, it's returned in the response.
 
 ### 5. Reset Password
 ```bash
@@ -58,6 +100,13 @@ curl -X POST "http://localhost:8000/api/v1/auth/reset-password" \
     "token": "RESET_TOKEN_FROM_FORGOT_PASSWORD",
     "new_password": "newpassword123"
   }'
+```
+
+**Response:**
+```json
+{
+  "message": "Password has been reset successfully"
+}
 ```
 
 **Note:** The reset token expires after 1 hour. After resetting, the token is invalidated.
@@ -72,6 +121,32 @@ curl -X POST "http://localhost:8000/api/v1/auth/reset-password" \
 ```bash
 curl -X GET "http://localhost:8000/api/v1/transactions/?skip=0&limit=10" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "amount": 50.00,
+    "category": "dining",
+    "payment_method": "card",
+    "description": "Campus Dining Hall - Dinner",
+    "transaction_date": "2025-11-15T18:30:00Z",
+    "created_at": "2025-11-15T18:30:15.123456Z"
+  },
+  {
+    "id": 2,
+    "user_id": 1,
+    "amount": 25.50,
+    "category": "entertainment",
+    "payment_method": "card",
+    "description": "Movie Ticket",
+    "transaction_date": "2025-11-14T20:00:00Z",
+    "created_at": "2025-11-14T20:00:10.654321Z"
+  }
+]
 ```
 
 ### 7. Get Transactions with Filters
@@ -97,6 +172,20 @@ curl -X GET "http://localhost:8000/api/v1/transactions/1" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
+**Response:**
+```json
+{
+  "id": 1,
+  "user_id": 1,
+  "amount": 50.00,
+  "category": "dining",
+  "payment_method": "card",
+  "description": "Campus Dining Hall - Dinner",
+  "transaction_date": "2025-11-15T18:30:00Z",
+  "created_at": "2025-11-15T18:30:15.123456Z"
+}
+```
+
 ### 9. Get Spending Analytics
 ```bash
 # Get analytics for last 30 days (default)
@@ -108,6 +197,28 @@ curl -X GET "http://localhost:8000/api/v1/transactions/analytics?start_date=2025
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
+**Response:**
+```json
+{
+  "total_spent": 125.50,
+  "transaction_count": 5,
+  "average_transaction": 25.10,
+  "by_category": {
+    "dining": 75.00,
+    "entertainment": 25.50,
+    "services": 25.00
+  },
+  "by_payment_method": {
+    "card": 100.00,
+    "cash": 25.50
+  },
+  "period": {
+    "start_date": "2025-11-01T00:00:00Z",
+    "end_date": "2025-11-30T23:59:59Z"
+  }
+}
+```
+
 ---
 
 ## Budget Endpoints
@@ -116,6 +227,23 @@ curl -X GET "http://localhost:8000/api/v1/transactions/analytics?start_date=2025
 ```bash
 curl -X GET "http://localhost:8000/api/v1/budgets/?skip=0&limit=10" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "category": "dining",
+    "limit_amount": 500.00,
+    "period": "monthly",
+    "start_date": "2025-11-01",
+    "end_date": "2025-11-30",
+    "created_at": "2025-11-01T00:00:00Z",
+    "updated_at": "2025-11-01T00:00:00Z"
+  }
+]
 ```
 
 ### 11. Create Budget
@@ -132,6 +260,21 @@ curl -X POST "http://localhost:8000/api/v1/budgets/" \
   }'
 ```
 
+**Response:**
+```json
+{
+  "id": 1,
+  "user_id": 1,
+  "category": "dining",
+  "limit_amount": 500.00,
+  "period": "monthly",
+  "start_date": "2025-11-01",
+  "end_date": "2025-11-30",
+  "created_at": "2025-11-01T00:00:00Z",
+  "updated_at": "2025-11-01T00:00:00Z"
+}
+```
+
 **Available periods:** `weekly`, `monthly`
 
 ### 12. Get Budget by ID
@@ -140,16 +283,73 @@ curl -X GET "http://localhost:8000/api/v1/budgets/1" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
+**Response:**
+```json
+{
+  "id": 1,
+  "user_id": 1,
+  "category": "dining",
+  "limit_amount": 500.00,
+  "period": "monthly",
+  "start_date": "2025-11-01",
+  "end_date": "2025-11-30",
+  "created_at": "2025-11-01T00:00:00Z",
+  "updated_at": "2025-11-01T00:00:00Z"
+}
+```
+
 ### 13. Get Budget Tracking
 ```bash
 curl -X GET "http://localhost:8000/api/v1/budgets/1/tracking" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
+**Response:**
+```json
+{
+  "id": 1,
+  "user_id": 1,
+  "category": "dining",
+  "limit_amount": 500.00,
+  "period": "monthly",
+  "start_date": "2025-11-01",
+  "end_date": "2025-11-30",
+  "created_at": "2025-11-01T00:00:00Z",
+  "updated_at": "2025-11-01T00:00:00Z",
+  "current_spending": 125.50,
+  "remaining_amount": 374.50,
+  "percentage_used": 25.1,
+  "status": "under"
+}
+```
+
+**Status values:** `under` (spending < limit), `at_limit` (spending = limit), `over` (spending > limit)
+
 ### 14. Get All Budgets with Tracking
 ```bash
 curl -X GET "http://localhost:8000/api/v1/budgets/tracking" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "category": "dining",
+    "limit_amount": 500.00,
+    "period": "monthly",
+    "start_date": "2025-11-01",
+    "end_date": "2025-11-30",
+    "created_at": "2025-11-01T00:00:00Z",
+    "updated_at": "2025-11-01T00:00:00Z",
+    "current_spending": 125.50,
+    "remaining_amount": 374.50,
+    "percentage_used": 25.1,
+    "status": "under"
+  }
+]
 ```
 
 ### 15. Update Budget
@@ -162,11 +362,32 @@ curl -X PUT "http://localhost:8000/api/v1/budgets/1" \
   }'
 ```
 
+**Response:**
+```json
+{
+  "id": 1,
+  "user_id": 1,
+  "category": "dining",
+  "limit_amount": 600.00,
+  "period": "monthly",
+  "start_date": "2025-11-01",
+  "end_date": "2025-11-30",
+  "created_at": "2025-11-01T00:00:00Z",
+  "updated_at": "2025-11-15T14:30:00Z"
+}
+```
+
 ### 16. Delete Budget
 ```bash
 curl -X DELETE "http://localhost:8000/api/v1/budgets/1" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
+
+**Response:**
+- **Status Code:** `204 No Content`
+- **Body:** Empty (no response body)
+
+**Note:** The delete endpoint returns a 204 status code with no response body, which is the standard REST API behavior for successful deletions.
 
 ---
 
@@ -176,6 +397,32 @@ curl -X DELETE "http://localhost:8000/api/v1/budgets/1" \
 ```bash
 curl -X GET "http://localhost:8000/api/v1/payments/?skip=0&limit=10" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "payment_type": "event",
+    "amount": 50.00,
+    "status": "pending",
+    "description": "HackFest 2025 Registration",
+    "created_at": "2025-11-15T10:00:00Z",
+    "updated_at": "2025-11-15T10:00:00Z"
+  },
+  {
+    "id": 2,
+    "user_id": 1,
+    "payment_type": "dining",
+    "amount": 15.75,
+    "status": "completed",
+    "description": "Campus Dining Hall - Dinner",
+    "created_at": "2025-11-15T18:00:00Z",
+    "updated_at": "2025-11-15T18:30:15Z"
+  }
+]
 ```
 
 ### 18. Get Payments with Filters
@@ -208,10 +455,38 @@ curl -X POST "http://localhost:8000/api/v1/payments/" \
   }'
 ```
 
+**Response:**
+```json
+{
+  "id": 1,
+  "user_id": 1,
+  "payment_type": "event",
+  "amount": 50.00,
+  "status": "pending",
+  "description": "HackFest 2025 Registration",
+  "created_at": "2025-11-15T10:00:00Z",
+  "updated_at": "2025-11-15T10:00:00Z"
+}
+```
+
 ### 20. Get Payment by ID
 ```bash
 curl -X GET "http://localhost:8000/api/v1/payments/1" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "user_id": 1,
+  "payment_type": "event",
+  "amount": 50.00,
+  "status": "pending",
+  "description": "HackFest 2025 Registration",
+  "created_at": "2025-11-15T10:00:00Z",
+  "updated_at": "2025-11-15T10:00:00Z"
+}
 ```
 
 ### 21. Complete Payment
@@ -220,17 +495,181 @@ curl -X POST "http://localhost:8000/api/v1/payments/1/complete" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
+**Response:**
+```json
+{
+  "id": 1,
+  "user_id": 1,
+  "payment_type": "event",
+  "amount": 50.00,
+  "status": "completed",
+  "description": "HackFest 2025 Registration",
+  "created_at": "2025-11-15T10:00:00Z",
+  "updated_at": "2025-11-15T18:30:15Z"
+}
+```
+
 **Note:** Completing a payment automatically creates a transaction record. The transaction will appear in the transactions list after the payment is completed.
 
 **Important:** Payments cannot be updated or deleted once created. They are immutable records. Only the status can be changed by completing the payment.
 
 ---
 
+## Card Endpoints
+
+### 22. Get All Cards
+```bash
+curl -X GET "http://localhost:8000/api/v1/cards/?skip=0&limit=10" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "card_number": "1234",
+    "cardholder_name": "John Doe",
+    "expiry_date": "2026-12-31",
+    "card_type": "debit",
+    "bank_name": "Chase Bank",
+    "is_default": true,
+    "created_at": "2025-11-15T17:54:54.407242Z",
+    "updated_at": "2025-11-15T17:54:54.407242Z"
+  },
+  {
+    "id": 2,
+    "user_id": 1,
+    "card_number": "5678",
+    "cardholder_name": "John Doe",
+    "expiry_date": "2027-06-30",
+    "card_type": "credit",
+    "bank_name": "Bank of America",
+    "is_default": false,
+    "created_at": "2025-11-15T17:54:56.712962Z",
+    "updated_at": "2025-11-15T17:54:56.712962Z"
+  }
+]
+```
+
+### 23. Create Card
+```bash
+curl -X POST "http://localhost:8000/api/v1/cards/" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "card_number": "1234",
+    "cardholder_name": "John Doe",
+    "expiry_date": "2026-12-31",
+    "card_type": "debit",
+    "bank_name": "Chase Bank",
+    "is_default": true
+  }'
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "user_id": 1,
+  "card_number": "1234",
+  "cardholder_name": "John Doe",
+  "expiry_date": "2026-12-31",
+  "card_type": "debit",
+  "bank_name": "Chase Bank",
+  "is_default": true,
+  "created_at": "2025-11-15T17:54:54.407242Z",
+  "updated_at": "2025-11-15T17:54:54.407242Z"
+}
+```
+
+**Note:** 
+- `card_number` must be exactly 4 digits (last 4 digits of the card)
+- `card_type` must be either `debit` or `credit`
+- `expiry_date` format: `YYYY-MM-DD`
+- Setting `is_default` to `true` will automatically unset other default cards for the user
+- `bank_name` is optional
+
+### 24. Get Card by ID
+```bash
+curl -X GET "http://localhost:8000/api/v1/cards/1" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "user_id": 1,
+  "card_number": "1234",
+  "cardholder_name": "John Doe",
+  "expiry_date": "2026-12-31",
+  "card_type": "debit",
+  "bank_name": "Chase Bank",
+  "is_default": true,
+  "created_at": "2025-11-15T17:54:54.407242Z",
+  "updated_at": "2025-11-15T17:54:54.407242Z"
+}
+```
+
+### 25. Update Card
+```bash
+curl -X PUT "http://localhost:8000/api/v1/cards/1" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "cardholder_name": "John D. Doe",
+    "bank_name": "Updated Bank Name",
+    "is_default": false
+  }'
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "user_id": 1,
+  "card_number": "1234",
+  "cardholder_name": "John D. Doe",
+  "expiry_date": "2026-12-31",
+  "card_type": "debit",
+  "bank_name": "Updated Bank Name",
+  "is_default": false,
+  "created_at": "2025-11-15T17:54:54.407242Z",
+  "updated_at": "2025-11-15T18:00:00.123456Z"
+}
+```
+
+**Note:** Only provided fields will be updated. You cannot update `card_number` or `card_type` after creation. Setting `is_default` to `true` will automatically unset other default cards.
+
+### 26. Delete Card
+```bash
+curl -X DELETE "http://localhost:8000/api/v1/cards/1" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+**Response:**
+- **Status Code:** `204 No Content`
+- **Body:** Empty (no response body)
+
+**Note:** The delete endpoint returns a 204 status code with no response body, which is the standard REST API behavior for successful deletions.
+
+---
+
 ## Health Check
 
-### 22. Health Check
+### 27. Health Check
 ```bash
 curl -X GET "http://localhost:8000/health"
+```
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "database": "connected"
+}
 ```
 
 ---
@@ -299,4 +738,5 @@ curl -X GET "http://localhost:8000/api/v1/transactions/analytics" \
 - **Transactions are read-only**: They are automatically created when payments are completed. You cannot manually create, update, or delete transactions.
 - **Payments are immutable**: Once created, payments cannot be updated or deleted. Only the status can be changed by completing the payment.
 - **Payment Flow**: Create a payment → Complete the payment → Transaction is automatically created
+- **Cards**: Users can manage multiple debit/credit cards. Only one card can be set as default at a time. Card number is stored as last 4 digits only for security.
 

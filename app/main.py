@@ -11,7 +11,7 @@ from app.exceptions import (
 )
 from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import SQLAlchemyError
-from app.api.v1 import auth, transactions, budgets, payments
+from app.api.v1 import auth, transactions, budgets, payments, cards
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -52,6 +52,7 @@ app.include_router(auth.router, prefix="/api/v1")
 app.include_router(transactions.router, prefix="/api/v1")
 app.include_router(budgets.router, prefix="/api/v1")
 app.include_router(payments.router, prefix="/api/v1")
+app.include_router(cards.router, prefix="/api/v1")
 
 
 if __name__ == "__main__":
