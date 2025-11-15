@@ -1,7 +1,11 @@
 from sqlalchemy.orm import Session
+from datetime import datetime, timezone
 from app.repositories.wallet_repository import WalletRepository
 from app.repositories.card_repository import CardRepository
+from app.repositories.transaction_repository import TransactionRepository
+from app.models.transaction import TransactionCategory, PaymentMethod
 from app.schemas.wallet import WalletLoadRequest
+from app.schemas.transaction import TransactionCreate
 from app.exceptions import NotFoundError, ValidationError
 
 
@@ -10,6 +14,7 @@ class WalletService:
         self.db = db
         self.wallet_repo = WalletRepository(db)
         self.card_repo = CardRepository(db)
+        self.transaction_repo = TransactionRepository(db)
 
     def get_wallet_balance(self, user_id: int) -> dict:
         """Get current wallet balance for user. Creates wallet if it doesn't exist (lazy creation)."""
@@ -28,6 +33,7 @@ class WalletService:
         - Validates card exists and belongs to user
         - Validates amount > 0
         - Updates wallet balance atomically
+        - Creates a transaction record
         """
         # Validate card exists and belongs to user
         card = self.card_repo.get_by_id(load_request.card_id, user_id)
@@ -45,6 +51,20 @@ class WalletService:
         
         # Update balance atomically
         updated_wallet = self.wallet_repo.update_balance(wallet, load_request.amount)
+        
+        # Create transaction record for wallet load
+        transaction_data = TransactionCreate(
+            amount=load_request.amount,
+            category=TransactionCategory.SERVICES,
+            merchant="Flex Dollars Wallet",
+            location=None,
+            payment_method=PaymentMethod.CARD,
+            date=datetime.now(timezone.utc),
+            description=f"Loaded ${load_request.amount:.2f} from {card.card_type.value} card ending in {card.card_number}"
+        )
+        
+        # Create the transaction
+        self.transaction_repo.create(user_id, transaction_data)
         
         return self._wallet_to_dict(updated_wallet)
 
