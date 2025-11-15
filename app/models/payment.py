@@ -26,6 +26,7 @@ class Payment(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    vendor_id = Column(Integer, ForeignKey("vendors.id"), nullable=True, index=True)
     payment_type = Column(Enum(PaymentType), nullable=False)
     amount = Column(Float, nullable=False)
     description = Column(String, nullable=False)
@@ -35,4 +36,5 @@ class Payment(Base):
 
     # Relationships
     user = relationship("User", back_populates="payments")
+    vendor = relationship("Vendor", back_populates="payments")
 

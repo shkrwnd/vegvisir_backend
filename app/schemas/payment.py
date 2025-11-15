@@ -8,6 +8,7 @@ class PaymentBase(BaseModel):
     payment_type: PaymentType
     amount: float = Field(..., gt=0)
     description: str = Field(..., min_length=1, max_length=500)
+    vendor_id: Optional[int] = Field(None, description="ID of the vendor (for Raider card payments)")
 
 
 class PaymentCreate(PaymentBase):
@@ -24,6 +25,7 @@ class PaymentUpdate(BaseModel):
 class PaymentResponse(PaymentBase):
     id: int
     user_id: int
+    vendor_id: Optional[int]
     status: PaymentStatus
     created_at: datetime
     updated_at: datetime
