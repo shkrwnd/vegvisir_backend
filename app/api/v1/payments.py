@@ -7,7 +7,7 @@ from app.models.user import User
 from app.models.payment import PaymentStatus, PaymentType
 from app.schemas.payment import PaymentCreate
 from app.services.payment_service import PaymentService
-from app.exceptions import NotFoundError
+from app.exceptions import NotFoundError, ValidationError
 
 router = APIRouter(prefix="/payments", tags=["Payments"])
 
@@ -57,7 +57,18 @@ def create_payment(
     Complete the payment to finalize it and create a transaction record.
     """
     service = PaymentService(db)
-    return service.create_payment(current_user.id, payment_data)
+    try:
+        return service.create_payment(current_user.id, payment_data)
+    except ValidationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e.message)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
 
 
 @router.get("/{payment_id}", response_model=dict)

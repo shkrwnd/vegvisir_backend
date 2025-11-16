@@ -1,28 +1,32 @@
-"""Add vendors table and vendor_id to payments
+"""Comprehensive campus wallet update: vendors, payment types, and payment flow
 
-Revision ID: add_vendors_table_20251115
-Revises: f2990ed00faa
-Create Date: 2025-11-15 16:23:25
+Revision ID: 7a8b9c0d1e2f
+Revises: 1d831e460f9a, fd52396f852f
+Create Date: 2025-11-15 20:00:00
 
+This comprehensive migration includes:
+1. Add vendors table with meal plan and Raider card acceptance flags
+2. Add vendor_id column to payments table
+3. Add new payment types: RETAIL, SERVICES, ENTERTAINMENT
+4. Update payment creation flow to immediately create transactions and deduct from wallet
+5. Ensure database columns exist with idempotent checks
 """
 from typing import Sequence, Union
-
 from alembic import op
 import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'add_vendors_table_20251115'
-down_revision: Union[str, None] = 'f2990ed00faa'
+revision: str = '7a8b9c0d1e2f'
+down_revision: Union[str, Sequence[str], None] = ('1d831e460f9a', 'fd52396f852f')
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # Create vendors table (if it doesn't exist)
     bind = op.get_bind()
     
-    # Check if vendors table exists
+    # ===== 1. CREATE VENDORS TABLE (if it doesn't exist) =====
     result = bind.execute(sa.text("""
         SELECT EXISTS (
             SELECT FROM information_schema.tables 
@@ -49,12 +53,10 @@ def upgrade() -> None:
                 updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
             )
         """))
-        
-        # Create index
         bind.execute(sa.text("CREATE INDEX IF NOT EXISTS ix_vendors_id ON vendors(id)"))
         bind.commit()
 
-    # Seed static vendor data for Rutgers-Newark
+    # ===== 2. SEED VENDORS DATA =====
     op.execute("""
         INSERT INTO vendors (name, category, description, location, hours, accepts_raider_card, accepts_meal_plan, is_active)
         VALUES
@@ -68,7 +70,7 @@ def upgrade() -> None:
         ON CONFLICT (name) DO NOTHING;
     """)
 
-    # Add vendor_id column to payments table (if it doesn't exist)
+    # ===== 3. ADD VENDOR_ID COLUMN TO PAYMENTS (if it doesn't exist) =====
     result = bind.execute(sa.text("""
         SELECT EXISTS (
             SELECT FROM information_schema.columns 
@@ -83,7 +85,6 @@ def upgrade() -> None:
         bind.execute(sa.text("ALTER TABLE payments ADD COLUMN vendor_id INTEGER"))
         bind.execute(sa.text("CREATE INDEX IF NOT EXISTS ix_payments_vendor_id ON payments(vendor_id)"))
         
-        # Check if foreign key exists before creating
         fk_result = bind.execute(sa.text("""
             SELECT EXISTS (
                 SELECT FROM information_schema.table_constraints 
@@ -101,13 +102,27 @@ def upgrade() -> None:
             """))
         bind.commit()
 
+    # ===== 4. ADD PAYMENT TYPE ENUM VALUES =====
+    try:
+        bind.execute(sa.text("ALTER TYPE paymenttype ADD VALUE 'RETAIL' BEFORE 'OTHER'"))
+    except Exception:
+        pass
+    
+    try:
+        bind.execute(sa.text("ALTER TYPE paymenttype ADD VALUE 'SERVICES' BEFORE 'OTHER'"))
+    except Exception:
+        pass
+    
+    try:
+        bind.execute(sa.text("ALTER TYPE paymenttype ADD VALUE 'ENTERTAINMENT' BEFORE 'OTHER'"))
+    except Exception:
+        pass
+
 
 def downgrade() -> None:
-    # Remove vendor_id from payments table
+    # Revert vendors table
     op.drop_constraint('fk_payments_vendor_id', 'payments', type_='foreignkey')
     op.drop_index(op.f('ix_payments_vendor_id'), table_name='payments')
     op.drop_column('payments', 'vendor_id')
-
-    # Drop vendors table
     op.drop_index(op.f('ix_vendors_id'), table_name='vendors')
     op.drop_table('vendors')

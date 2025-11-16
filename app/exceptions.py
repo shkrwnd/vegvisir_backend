@@ -49,9 +49,18 @@ async def app_exception_handler(request: Request, exc: AppException):
 
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Handler for request validation errors."""
+    # Extract clean error messages instead of returning raw Pydantic errors
+    error_messages = []
+    for error in exc.errors():
+        field = ".".join(str(x) for x in error["loc"][1:])  # Skip the "body" prefix
+        msg = error["msg"]
+        error_messages.append(f"{field}: {msg}")
+    
+    detail = "Invalid request data: " + "; ".join(error_messages) if error_messages else "Validation failed"
+    
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={"detail": exc.errors()}
+        content={"detail": detail}
     )
 
 

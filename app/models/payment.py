@@ -6,19 +6,22 @@ from app.database import Base
 
 
 class PaymentType(str, enum.Enum):
-    EVENT = "event"
-    CLUB = "club"
-    DINING = "dining"
-    PRINTING = "printing"
-    SERVICE = "service"
-    OTHER = "other"
+    EVENT = "EVENT"
+    CLUB = "CLUB"
+    DINING = "DINING"
+    PRINTING = "PRINTING"
+    SERVICE = "SERVICE"
+    RETAIL = "RETAIL"
+    SERVICES = "SERVICES"
+    ENTERTAINMENT = "ENTERTAINMENT"
+    OTHER = "OTHER"
 
 
 class PaymentStatus(str, enum.Enum):
-    PENDING = "pending"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    CANCELLED = "cancelled"
+    PENDING = "PENDING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
 
 
 class Payment(Base):
