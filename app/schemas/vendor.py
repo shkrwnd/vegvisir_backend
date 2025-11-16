@@ -8,6 +8,8 @@ class VendorBase(BaseModel):
     category: str = Field(..., min_length=1, max_length=100)
     description: Optional[str] = Field(None, max_length=1000)
     location: Optional[str] = Field(None, max_length=255)
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     logo_url: Optional[str] = Field(None, max_length=500)
     hours: Optional[str] = Field(None, max_length=500)
     accepts_raider_card: bool = True
@@ -23,6 +25,8 @@ class VendorUpdate(BaseModel):
     category: Optional[str] = Field(None, min_length=1, max_length=100)
     description: Optional[str] = Field(None, max_length=1000)
     location: Optional[str] = Field(None, max_length=255)
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     logo_url: Optional[str] = Field(None, max_length=500)
     hours: Optional[str] = Field(None, max_length=500)
     accepts_raider_card: Optional[bool] = None

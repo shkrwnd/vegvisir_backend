@@ -25,6 +25,8 @@ def seed_vendors():
             "category": "dining",
             "description": "Attached to Woodward Hall, Stonsby Commons is the main residential dining hall on campus, and is open to any student with a meal plan. Accepts meal plan flex dollars only.",
             "location": "91 Bleeker Street",
+            "latitude": 40.74260580127387,
+            "longitude": -74.17464409517413,
             "hours": "Sunday: 11:00 AM - 8:00 PM\nMonday-Wednesday: 7:30 AM - 10:30 PM\nThursday-Friday: 7:30 AM - 8:00 PM\nSaturday: 11:00 AM - 8:00 PM",
             "accepts_raider_card": True,
             "is_active": True
@@ -34,6 +36,8 @@ def seed_vendors():
             "category": "dining",
             "description": "Located on the second floor of the Paul Robeson Campus Center. JBJ Soul Kitchen is a non-profit Community Restaurant established by the Jon Bon Jovi Soul Foundation. Accepts both meal plan and real money.",
             "location": "350 Dr Martin Luther King Jr Blvd (PRCC)",
+            "latitude": 40.74197721114958,
+            "longitude": -74.17628336972562,
             "hours": "Saturday: 5:00 PM - 7:00 PM\nSunday: 11:30 AM - 1:30 PM\nMonday: Closed\nTuesday: Closed\nWednesday: 5:00 PM - 7:00 PM\nThursday: 5:00 PM - 7:00 PM\nFriday: 11:30 AM - 1:30 PM, 5:00 PM - 7:00 PM",
             "accepts_raider_card": True,
             "is_active": True
@@ -43,6 +47,8 @@ def seed_vendors():
             "category": "retail",
             "description": "Convenience store located in the lower level of the Paul Robeson Campus Center. Accepts flex dollars.",
             "location": "350 Dr Martin Luther King Jr Blvd (PRCC)",
+            "latitude": 40.74215252601952,
+            "longitude": -74.17602394162405,
             "hours": "Monday-Thursday: 10:00 AM - 6:00 PM\nFriday: 10:00 AM - 4:00 PM",
             "accepts_raider_card": True,
             "is_active": True
@@ -52,6 +58,8 @@ def seed_vendors():
             "category": "dining",
             "description": "Food court located in the lower level of the Paul Robeson Campus Center. Accepts flex dollars.",
             "location": "350 Dr Martin Luther King Jr Blvd (PRCC)",
+            "latitude": 40.74232183038403,
+            "longitude": -74.17594088346885,
             "hours": "Monday-Friday: 11:00 AM - 5:00 PM",
             "accepts_raider_card": True,
             "is_active": True
@@ -61,6 +69,8 @@ def seed_vendors():
             "category": "dining",
             "description": "Starbucks located in the lower level of the Paul Robeson Campus Center. Accepts flex dollars.",
             "location": "350 Dr Martin Luther King Jr Blvd (PRCC)",
+            "latitude": 40.74171625829827,
+            "longitude": -74.17633805481596,
             "hours": "Monday-Thursday: 8:00 AM - 8:00 PM\nFriday: 8:00 AM - 4:00 PM\nSaturday: 8:00 AM - 1:00 PM",
             "accepts_raider_card": True,
             "is_active": True
@@ -70,6 +80,8 @@ def seed_vendors():
             "category": "dining",
             "description": "Starbucks located in the Rutgers Business School. Accepts flex dollars.",
             "location": "1 Washington Place (RBS)",
+            "latitude": 40.7405,
+            "longitude": -74.1733,
             "hours": "Monday-Thursday: 8:00 AM - 8:00 PM\nFriday: 8:00 AM - 4:00 PM",
             "accepts_raider_card": True,
             "is_active": True
@@ -79,6 +91,8 @@ def seed_vendors():
             "category": "retail",
             "description": "Rutgers University's official campus bookstore.",
             "location": "42 Halsey Street",
+            "latitude": 40.741006547962726,
+            "longitude": -74.17089869774786,
             "hours": "Monday: 10:00 AM - 5:00 PM\nTuesday: 10:00 AM - 5:00 PM\nWednesday: 10:00 AM - 5:00 PM\nThursday: 10:00 AM - 5:00 PM\nFriday: 10:00 AM - 5:00 PM\nSaturday: Closed\nSunday: Closed",
             "accepts_raider_card": True,
             "is_active": True
