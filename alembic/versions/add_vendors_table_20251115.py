@@ -19,25 +19,40 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # Create vendors table
-    op.create_table(
-        'vendors',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('name', sa.String(), nullable=False),
-        sa.Column('category', sa.String(), nullable=False),
-        sa.Column('description', sa.String(), nullable=True),
-        sa.Column('location', sa.String(), nullable=True),
-        sa.Column('hours', sa.String(), nullable=True),
-        sa.Column('logo_url', sa.String(), nullable=True),
-        sa.Column('accepts_raider_card', sa.Boolean(), nullable=False, server_default='true'),
-        sa.Column('accepts_meal_plan', sa.Boolean(), nullable=False, server_default='true'),
-        sa.Column('is_active', sa.Boolean(), nullable=False, server_default='true'),
-        sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-        sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-        sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('name')
-    )
-    op.create_index(op.f('ix_vendors_id'), 'vendors', ['id'], unique=False)
+    # Create vendors table (if it doesn't exist)
+    bind = op.get_bind()
+    
+    # Check if vendors table exists
+    result = bind.execute(sa.text("""
+        SELECT EXISTS (
+            SELECT FROM information_schema.tables 
+            WHERE table_schema = 'public' 
+            AND table_name = 'vendors'
+        )
+    """))
+    table_exists = result.scalar()
+    
+    if not table_exists:
+        bind.execute(sa.text("""
+            CREATE TABLE vendors (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR NOT NULL UNIQUE,
+                category VARCHAR NOT NULL,
+                description VARCHAR,
+                location VARCHAR,
+                hours VARCHAR,
+                logo_url VARCHAR,
+                accepts_raider_card BOOLEAN NOT NULL DEFAULT true,
+                accepts_meal_plan BOOLEAN NOT NULL DEFAULT true,
+                is_active BOOLEAN NOT NULL DEFAULT true,
+                created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+                updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+            )
+        """))
+        
+        # Create index
+        bind.execute(sa.text("CREATE INDEX IF NOT EXISTS ix_vendors_id ON vendors(id)"))
+        bind.commit()
 
     # Seed static vendor data for Rutgers-Newark
     op.execute("""
@@ -53,10 +68,38 @@ def upgrade() -> None:
         ON CONFLICT (name) DO NOTHING;
     """)
 
-    # Add vendor_id column to payments table
-    op.add_column('payments', sa.Column('vendor_id', sa.Integer(), nullable=True))
-    op.create_index(op.f('ix_payments_vendor_id'), 'payments', ['vendor_id'], unique=False)
-    op.create_foreign_key('fk_payments_vendor_id', 'payments', 'vendors', ['vendor_id'], ['id'])
+    # Add vendor_id column to payments table (if it doesn't exist)
+    result = bind.execute(sa.text("""
+        SELECT EXISTS (
+            SELECT FROM information_schema.columns 
+            WHERE table_schema = 'public' 
+            AND table_name = 'payments' 
+            AND column_name = 'vendor_id'
+        )
+    """))
+    column_exists = result.scalar()
+    
+    if not column_exists:
+        bind.execute(sa.text("ALTER TABLE payments ADD COLUMN vendor_id INTEGER"))
+        bind.execute(sa.text("CREATE INDEX IF NOT EXISTS ix_payments_vendor_id ON payments(vendor_id)"))
+        
+        # Check if foreign key exists before creating
+        fk_result = bind.execute(sa.text("""
+            SELECT EXISTS (
+                SELECT FROM information_schema.table_constraints 
+                WHERE constraint_schema = 'public' 
+                AND constraint_name = 'fk_payments_vendor_id'
+            )
+        """))
+        fk_exists = fk_result.scalar()
+        
+        if not fk_exists:
+            bind.execute(sa.text("""
+                ALTER TABLE payments 
+                ADD CONSTRAINT fk_payments_vendor_id 
+                FOREIGN KEY (vendor_id) REFERENCES vendors(id)
+            """))
+        bind.commit()
 
 
 def downgrade() -> None:
