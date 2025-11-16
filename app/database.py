@@ -37,10 +37,6 @@ def get_db():
                 ALTER TABLE vendors
                 ADD COLUMN IF NOT EXISTS hours VARCHAR;
             """))
-            db.execute(text("""
-                ALTER TABLE vendors
-                ADD COLUMN IF NOT EXISTS accepts_meal_plan BOOLEAN DEFAULT true;
-            """))
             # If the Barnes & Noble row should accept Raider card, ensure it's set (dev convenience)
             db.execute(text("""
                 UPDATE vendors

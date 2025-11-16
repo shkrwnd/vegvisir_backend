@@ -16,8 +16,6 @@ class Vendor(Base):
     hours = Column(String, nullable=True)  # Operating hours
     # `accepts_raider_card` indicates the vendor accepts payments via the Raider card (real money).
     accepts_raider_card = Column(Boolean, default=True, nullable=False)
-    # `accepts_meal_plan` indicates acceptance of meal-plan flex dollars.
-    accepts_meal_plan = Column(Boolean, default=True, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)

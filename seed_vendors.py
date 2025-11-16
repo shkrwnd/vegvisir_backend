@@ -27,7 +27,6 @@ def seed_vendors():
             "location": "91 Bleeker Street",
             "hours": "Sunday: 11:00 AM - 8:00 PM\nMonday-Wednesday: 7:30 AM - 10:30 PM\nThursday-Friday: 7:30 AM - 8:00 PM\nSaturday: 11:00 AM - 8:00 PM",
             "accepts_raider_card": True,
-            "accepts_meal_plan": True,
             "is_active": True
         },
         {
@@ -37,7 +36,6 @@ def seed_vendors():
             "location": "350 Dr Martin Luther King Jr Blvd (PRCC)",
             "hours": "Saturday: 5:00 PM - 7:00 PM\nSunday: 11:30 AM - 1:30 PM\nMonday: Closed\nTuesday: Closed\nWednesday: 5:00 PM - 7:00 PM\nThursday: 5:00 PM - 7:00 PM\nFriday: 11:30 AM - 1:30 PM, 5:00 PM - 7:00 PM",
             "accepts_raider_card": True,
-            "accepts_meal_plan": True,
             "is_active": True
         },
         {
@@ -47,7 +45,6 @@ def seed_vendors():
             "location": "350 Dr Martin Luther King Jr Blvd (PRCC)",
             "hours": "Monday-Thursday: 10:00 AM - 6:00 PM\nFriday: 10:00 AM - 4:00 PM",
             "accepts_raider_card": True,
-            "accepts_meal_plan": True,
             "is_active": True
         },
         {
@@ -57,7 +54,6 @@ def seed_vendors():
             "location": "350 Dr Martin Luther King Jr Blvd (PRCC)",
             "hours": "Monday-Friday: 11:00 AM - 5:00 PM",
             "accepts_raider_card": True,
-            "accepts_meal_plan": True,
             "is_active": True
         },
         {
@@ -67,7 +63,6 @@ def seed_vendors():
             "location": "350 Dr Martin Luther King Jr Blvd (PRCC)",
             "hours": "Monday-Thursday: 8:00 AM - 8:00 PM\nFriday: 8:00 AM - 4:00 PM\nSaturday: 8:00 AM - 1:00 PM",
             "accepts_raider_card": True,
-            "accepts_meal_plan": True,
             "is_active": True
         },
         {
@@ -77,7 +72,6 @@ def seed_vendors():
             "location": "1 Washington Place (RBS)",
             "hours": "Monday-Thursday: 8:00 AM - 8:00 PM\nFriday: 8:00 AM - 4:00 PM",
             "accepts_raider_card": True,
-            "accepts_meal_plan": True,
             "is_active": True
         },
         {
@@ -86,8 +80,7 @@ def seed_vendors():
             "description": "Rutgers University's official campus bookstore.",
             "location": "42 Halsey Street",
             "hours": "Monday: 10:00 AM - 5:00 PM\nTuesday: 10:00 AM - 5:00 PM\nWednesday: 10:00 AM - 5:00 PM\nThursday: 10:00 AM - 5:00 PM\nFriday: 10:00 AM - 5:00 PM\nSaturday: Closed\nSunday: Closed",
-            "accepts_raider_card": True,  # Accepts Raider card (real money)
-            "accepts_meal_plan": False,  # Does NOT accept meal plan flex dollars
+            "accepts_raider_card": True,
             "is_active": True
         }
     ]
@@ -105,10 +98,9 @@ def seed_vendors():
         all_vendors = db.query(Vendor).all()
         for vendor in all_vendors:
             raider = "YES" if vendor.accepts_raider_card else "NO"
-            meal = "YES" if getattr(vendor, 'accepts_meal_plan', None) else "NO"
             print(f"  {vendor.id}. {vendor.name}")
             print(f"     Category: {vendor.category} | Location: {vendor.location}")
-            print(f"     Raider Card: {raider} | Meal Plan: {meal}")
+            print(f"     Raider Card: {raider}")
             print()
 
     except Exception as e:

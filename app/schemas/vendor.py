@@ -11,7 +11,6 @@ class VendorBase(BaseModel):
     logo_url: Optional[str] = Field(None, max_length=500)
     hours: Optional[str] = Field(None, max_length=500)
     accepts_raider_card: bool = True
-    accepts_meal_plan: bool = True
     is_active: bool = True
 
 
@@ -27,7 +26,6 @@ class VendorUpdate(BaseModel):
     logo_url: Optional[str] = Field(None, max_length=500)
     hours: Optional[str] = Field(None, max_length=500)
     accepts_raider_card: Optional[bool] = None
-    accepts_meal_plan: Optional[bool] = None
     is_active: Optional[bool] = None
 
 
